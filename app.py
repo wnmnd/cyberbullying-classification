@@ -1,31 +1,19 @@
 import streamlit as st
+import pickle
 import numpy as np
-import tensorflow as tf
 
-# Load the TFLite model
-def load_model(tflite_path):
-    interpreter = tf.lite.Interpreter(model_path=tflite_path)
-    interpreter.allocate_tensors()
-    return interpreter
+# Load the Random Forest model
+def load_model(model_path):
+    with open(model_path, "rb") as file:
+        model = pickle.load(file)
+    return model
 
-# Preprocess text (You may need to adapt this based on your model's input requirements)
+# Preprocess the input text
 def preprocess_text(text, max_length=100):
-    # Example preprocessing: Truncate or pad text to a fixed length
-    # Add any tokenizer or transformation specific to your training process
-    # This is just a placeholder.
-    return np.zeros((1, max_length), dtype=np.float32)
-
-# Perform prediction
-def predict(interpreter, input_data):
-    input_index = interpreter.get_input_details()[0]['index']
-    output_index = interpreter.get_output_details()[0]['index']
-    interpreter.set_tensor(input_index, input_data)
-    interpreter.invoke()
-    prediction = interpreter.get_tensor(output_index)
-    return prediction
-
-# Mapping labels
-LABELS = ['Not Cyberbullying', 'Gender', 'Religion', 'Other Cyberbullying', 'Age', 'Ethnicity']
+    # Convert text to lowercase and truncate/pad to a fixed length
+    # Example preprocessing (you may need to adapt this based on your training data):
+    processed = text.lower()
+    return processed
 
 # Streamlit App
 def main():
@@ -35,12 +23,10 @@ def main():
     st.title("🔍 Cyberbullying Detection App")
     st.markdown(
         """
-        Welcome to the **Cyberbullying Detection App**! This tool uses a machine learning model to analyze 
-        text and identify potential categories of cyberbullying. It is designed to assist in understanding 
-        harmful online behavior and promote a safer digital environment.
+        Welcome to the **Cyberbullying Detection App**! This tool uses a Random Forest model 
+        to analyze text and classify it into one of six categories of cyberbullying.
         """
     )
-    st.image("https://via.placeholder.com/800x300.png?text=Cyberbullying+Awareness", use_column_width=True)
     st.markdown("---")
 
     # Description Section
@@ -56,17 +42,13 @@ def main():
            - **Other Cyberbullying**
            - **Age-based Cyberbullying**
            - **Ethnicity-based Cyberbullying**
-
-        ### Why This Matters
-        Identifying cyberbullying is crucial in combating harmful online interactions. 
-        By categorizing the behavior, we can better understand its nature and take steps toward prevention.
         """
     )
     st.markdown("---")
 
     # Load model
-    model_path = "cyberbullying.tflite"  # Update the path if needed
-    interpreter = load_model(model_path)
+    model_path = "random_forest_model.pkl"  # Update this if the file is in a different location
+    model = load_model(model_path)
 
     # Input Area
     st.markdown("### Enter Your Text Below")
@@ -78,16 +60,28 @@ def main():
         if user_input.strip():
             st.write("🔄 Detecting...")
             # Preprocess the input
-            input_data = preprocess_text(user_input)
+            preprocessed_text = preprocess_text(user_input)
             
-            # Predict
-            prediction = predict(interpreter, input_data)
-            category_index = np.argmax(prediction)
-            confidence = np.max(prediction)
+            # Vectorize the text (Assuming a vectorizer was used during model training)
+            # Replace `vectorizer` with the actual vectorizer object you saved
+            try:
+                with open("vectorizer.pkl", "rb") as vec_file:
+                    vectorizer = pickle.load(vec_file)
+                input_data = vectorizer.transform([preprocessed_text])
+                
+                # Predict
+                prediction = model.predict(input_data)
+                confidence = np.max(model.predict_proba(input_data))
 
-            # Display Results
-            st.success(f"🛡️ **Category**: {LABELS[category_index]}")
-            st.info(f"🔢 **Confidence Score**: {confidence:.2f}")
+                # Map prediction to category labels
+                LABELS = ['Not Cyberbullying', 'Gender', 'Religion', 'Other Cyberbullying', 'Age', 'Ethnicity']
+                category = LABELS[prediction[0]]
+
+                # Display Results
+                st.success(f"🛡️ **Category**: {category}")
+                st.info(f"🔢 **Confidence Score**: {confidence:.2f}")
+            except Exception as e:
+                st.error(f"❌ Error: {str(e)}")
         else:
             st.error("❌ Please enter some text to detect cyberbullying.")
 
