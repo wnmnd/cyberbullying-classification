@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pickle
 import numpy as np
@@ -45,8 +46,13 @@ def main():
     st.markdown("---")
 
     # Load model
-    model_path = "random_forest_model.pkl"  # Update this if the file is in a different location
-    model = load_model(model_path)
+    model_path = os.path.join(os.path.dirname(__file__), "random_forest_model.pkl")
+    vectorizer_path = os.path.join(os.path.dirname(__file__), "vectorizer.pkl")
+
+    try:
+        model = load_model(model_path)
+    except FileNotFoundError:
+        st.error("❌ Random Forest model file not found. Please upload `random_forest_model.pkl`.")
 
     # Input Area
     st.markdown("### Enter Your Text Below")
@@ -57,16 +63,13 @@ def main():
     if detect_button:
         if user_input.strip():
             st.write("🔄 Detecting...")
-            # Preprocess the input
             preprocessed_text = preprocess_text(user_input)
-            
-            # Vectorize the text (Assuming a vectorizer was used during model training)
+
             try:
-                with open("vectorizer.pkl", "rb") as vec_file:
+                with open(vectorizer_path, "rb") as vec_file:
                     vectorizer = pickle.load(vec_file)
                 input_data = vectorizer.transform([preprocessed_text])
                 
-                # Predict
                 prediction = model.predict(input_data)
                 confidence = np.max(model.predict_proba(input_data))
 
@@ -83,6 +86,8 @@ def main():
                 # Display Results
                 st.success(f"🛡️ **Category**: {category}")
                 st.info(f"🔢 **Confidence Score**: {confidence:.2f}")
+            except FileNotFoundError:
+                st.error("❌ Vectorizer file not found. Please upload `vectorizer.pkl`.")
             except Exception as e:
                 st.error(f"❌ Error: {str(e)}")
         else:
