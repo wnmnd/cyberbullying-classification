@@ -62,18 +62,10 @@ categories = ['Not Cyberbullying', 'Gender', 'Religion', 'Age', 'Ethnicity']
 def main():
     # Header
     st.title("🛡️ Cyberbullying Detection System")
-    st.markdown("""
-        <p style='font-size: 1.2rem; color: #666;'>
-        Detect different types of cyberbullying in text messages and social media posts.
-        </p>
-    """, unsafe_allow_html=True)
+    st.markdown("""<p style='font-size: 1.2rem; color: #666;'>Detect different types of cyberbullying in text messages and social media posts.</p>""", unsafe_allow_html=True)
     
     # Text input
-    user_input = st.text_area(
-        "Enter the text to analyze:",
-        height=150,
-        placeholder="Type or paste the text here..."
-    )
+    user_input = st.text_area("Enter the text to analyze:", height=150, placeholder="Type or paste the text here...")
     
     # Detect button
     if st.button("Detect", key="detect_button"):
@@ -95,8 +87,8 @@ def main():
                 sequence = tokenizer.texts_to_sequences([processed_text])
                 padded_sequence = pad_sequences(sequence, maxlen=100)
                 
-                # Set the input tensor
-                interpreter.set_tensor(input_details[0]['index'], padded_sequence)
+                # Set the input tensor (convert to float32)
+                interpreter.set_tensor(input_details[0]['index'], padded_sequence.astype(np.float32))
                 
                 # Run inference
                 interpreter.invoke()
@@ -119,14 +111,10 @@ def main():
                 
                 # Add recommendations based on the detection
                 if predicted_class != 0:
-                    st.markdown("""
-                        ### Recommendations:
-                        1. 🚫 Do not engage with harmful content
-                        2. 📸 Take screenshots as evidence
-                        3. 🔒 Block the sender if possible
-                        4. 📢 Report to relevant authorities
-                        5. 💬 Seek support from trusted individuals
+                    st.markdown("""### Recommendations:
+                    1. 🚫 Do not engage with harmful content
+                    2. 📸 Take screenshots as evidence
+                    3. 🔒 Block the sender if possible
+                    4. 📢 Report to relevant authorities
+                    5. 💬 Seek support from trusted individuals
                     """)
-
-if __name__ == "__main__":
-    main()
