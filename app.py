@@ -11,7 +11,6 @@ def load_model(model_path):
 # Preprocess the input text
 def preprocess_text(text, max_length=100):
     # Convert text to lowercase and truncate/pad to a fixed length
-    # Example preprocessing (you may need to adapt this based on your training data):
     processed = text.lower()
     return processed
 
@@ -24,7 +23,7 @@ def main():
     st.markdown(
         """
         Welcome to the **Cyberbullying Detection App**! This tool uses a Random Forest model 
-        to analyze text and classify it into one of six categories of cyberbullying.
+        to analyze text and classify it into one of five categories.
         """
     )
     st.markdown("---")
@@ -36,12 +35,11 @@ def main():
         1. Enter any text in the input box below. 
         2. Click on the **Detect Cyberbullying** button. 
         3. The app will classify the text into one of the following categories:
-           - **Not Cyberbullying**
-           - **Gender-based Cyberbullying**
            - **Religion-based Cyberbullying**
-           - **Other Cyberbullying**
            - **Age-based Cyberbullying**
+           - **Gender-based Cyberbullying**
            - **Ethnicity-based Cyberbullying**
+           - **Not Bullying**
         """
     )
     st.markdown("---")
@@ -63,7 +61,6 @@ def main():
             preprocessed_text = preprocess_text(user_input)
             
             # Vectorize the text (Assuming a vectorizer was used during model training)
-            # Replace `vectorizer` with the actual vectorizer object you saved
             try:
                 with open("vectorizer.pkl", "rb") as vec_file:
                     vectorizer = pickle.load(vec_file)
@@ -74,7 +71,13 @@ def main():
                 confidence = np.max(model.predict_proba(input_data))
 
                 # Map prediction to category labels
-                LABELS = ['Not Cyberbullying', 'Gender', 'Religion', 'Other Cyberbullying', 'Age', 'Ethnicity']
+                LABELS = [
+                    'Religion-based Cyberbullying',
+                    'Age-based Cyberbullying',
+                    'Gender-based Cyberbullying',
+                    'Ethnicity-based Cyberbullying',
+                    'Not Bullying'
+                ]
                 category = LABELS[prediction[0]]
 
                 # Display Results
