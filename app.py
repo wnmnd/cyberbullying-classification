@@ -36,6 +36,7 @@ def main():
         harmful online behavior and promote a safer digital environment.
         """
     )
+    # Removed the unnecessary image here
     st.markdown("---")
 
     # Description Section
