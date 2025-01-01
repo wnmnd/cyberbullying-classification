@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 import joblib
 
 # Load the joblib model
@@ -36,7 +35,6 @@ def main():
         harmful online behavior and promote a safer digital environment.
         """
     )
-    # Removed the unnecessary image here
     st.markdown("---")
 
     # Description Section
