@@ -36,7 +36,6 @@ def main():
         harmful online behavior and promote a safer digital environment.
         """
     )
-    st.image("https://via.placeholder.com/800x300.png?text=Cyberbullying+Awareness", use_column_width=True)
     st.markdown("---")
 
     # Description Section
@@ -101,7 +100,7 @@ def main():
         This tool is for educational purposes only and may not always produce accurate results. 
         Please use it responsibly and seek professional advice when dealing with serious cases of cyberbullying.
 
-        Created with ❤️ by [Your Name].
+        Created with ❤️ by Winaaa.
         """
     )
 
